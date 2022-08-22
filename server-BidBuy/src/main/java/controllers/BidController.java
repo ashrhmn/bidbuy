@@ -1,7 +1,6 @@
 package controllers;
 
-import dtos.BidDto;
-import dtos.JwtPayloadDto;
+import dtos.*;
 import lombok.RequiredArgsConstructor;
 import model.Bid;
 import model.Product;
@@ -56,7 +55,25 @@ public class BidController {
 
     @GetMapping(value = "/getByProductID/{id}", produces = APPLICATION_JSON_VALUE)
     public List<BidDto> getByProductID(@PathVariable String id) {
-        return this.bidService.getByProductId(Integer.parseInt(id)).stream().map(BidDto::fromDbWithRelations).collect(Collectors.toList());
+        return this.
+                bidService.
+                getByProductId(Integer.parseInt(id)).stream().map(bid -> {
+                    BidDto bidDto = BidDto.fromDbWithRelations(bid);
+                    ProductDto productDto = ProductDto.fromDbWithRelations(bid.getProduct());
+                    UserDto buyer = UserDto.fromDbWithRelations(bid.getProduct().getBuyer());
+                    UserDto seller = UserDto.fromDbWithRelations(bid.getProduct().getSeller());
+                    if (buyer != null) {
+                        buyer.setKyc(KycDto.fromDbWithRelations(bid.getProduct().getBuyer().getKyc()));
+                    }
+                    if (seller != null) {
+                        seller.setKyc(KycDto.fromDbWithRelations(bid.getProduct().getSeller().getKyc()));
+                    }
+                    productDto.setBuyer(buyer);
+                    productDto.setSeller(seller);
+                    bidDto.setProduct(productDto);
+                    bidDto.setBidder(UserDto.fromDbWithRelations(bid.getBidder()));
+                    return bidDto;
+                }).collect(Collectors.toList());
     }
 
     @RequestMapping("/getBySellerId")
@@ -83,10 +100,6 @@ public class BidController {
     public void update(@RequestParam(name = "bid", required = true) Bid bid) {
         this.bidService.update(bid);
     }
-
-
-
-
 
 
 }

@@ -76,8 +76,7 @@ public class AppConfig implements WebMvcConfigurer {
         transactionManager.setSessionFactory(sessionFactory().getObject());
         return transactionManager;
     }
-
-    //config java mail sender
+    
     @Bean
     public JavaMailSender javaMailSender() {
         JavaMailSenderImpl mailSender = new JavaMailSenderImpl();
@@ -92,5 +91,4 @@ public class AppConfig implements WebMvcConfigurer {
         props.put("mail.debug", "true");
         return mailSender;
     }
-
 }

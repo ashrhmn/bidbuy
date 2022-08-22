@@ -31,6 +31,7 @@ public class UserDto {
 
     private List<ProductDto> soldProducts;
     private List<ProductDto> boughtProducts;
+    private boolean isEmailVerified;
 
 
     public static UserDto fromDb(User user) {
@@ -43,7 +44,8 @@ public class UserDto {
 //                user.getPassword(),
                 user.getType(),
                 null,
-                null
+                null,
+                user.isEmailVerified()
         );
     }
 

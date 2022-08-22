@@ -42,7 +42,12 @@ public class ProductController {
                 .getAll(
                         Math.max(pageNo, 1),
                         Math.max(view, 10)
-                ).stream().map(ProductDto::fromDbWithRelations).collect(Collectors.toList());
+                ).stream().map((product) -> {
+                    ProductDto productDto = ProductDto.fromDbWithRelations(product);
+                    productDto.setBuyer(UserDto.fromDbWithRelations(product.getBuyer()));
+                    productDto.setSeller(UserDto.fromDbWithRelations(product.getSeller()));
+                    return productDto;
+                }).collect(Collectors.toList());
     }
 
 
@@ -74,7 +79,11 @@ public class ProductController {
 
     @GetMapping("/{id}")
     public ProductDto getById(@PathVariable(name = "id", required = true) int id) {
-        return ProductDto.fromDbWithRelations(this.productService.getById(id));
+        Product product = this.productService.getById(id);
+        ProductDto productDto = ProductDto.fromDbWithRelations(product);
+        productDto.setBuyer(UserDto.fromDbWithRelations(product.getBuyer()));
+        productDto.setSeller(UserDto.fromDbWithRelations(product.getSeller()));
+        return productDto;
     }
 
     @GetMapping("/getByIdUser")
@@ -131,11 +140,12 @@ public class ProductController {
     public void changeStatus(@RequestParam(name = "id", required = true) int id, @RequestParam(name = "status", required = true) String status) {
         this.productService.changeStatus(id, status);
     }
+
     //update buyer id
     @PutMapping("/sellProduct")
-    public void updateBuyer(@RequestParam(name = "id", required = true) int id, @RequestParam(name = "buyerId", required = true) int buyerId,@RequestParam(name="sellPrice", required = true)
+    public void updateBuyer(@RequestParam(name = "id", required = true) int id, @RequestParam(name = "buyerId", required = true) int buyerId, @RequestParam(name = "sellPrice", required = true)
     float sellPrice) {
-        this.productService.sellProduct(id, buyerId, sellPrice,"sold");
+        this.productService.sellProduct(id, buyerId, sellPrice, "sold");
     }
 
 }

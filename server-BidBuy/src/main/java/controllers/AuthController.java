@@ -81,7 +81,7 @@ public class AuthController {
             return new ResponseEntity<>(res, HttpStatus.BAD_REQUEST);
         }
         user.setNid(kycRes.getId());
-//        user.setKyc(kycRes);
+        user.setEmailVerified(false);
         user.setType("user");
         userService.save(user);
         res.put("message", "User created successfully");

@@ -24,7 +24,8 @@ const ViewBid = () => {
     [productId]
   );
   //get 1st value from bids
-  
+  console.log({ product });
+
   const handleSell = (buyerId: number, sellPrice: number) => {
     jsxService()
       .put(
@@ -91,7 +92,7 @@ const ViewBid = () => {
               {/* <!-- Comments content --> */}
               <div className="pt-6">
                 {/* <!-- Comment row --> */}
-                <h1 className="text-center font-medium text-xl my-4 text-slate-300">
+                <div className="text-center font-medium text-xl my-4 text-slate-300">
                   {!!bids && bids.length > 0
                     ? "Bids for this product"
                     : "No bids added"}
@@ -100,7 +101,7 @@ const ViewBid = () => {
                       Product is Sold to {product.seller?.kyc?.name}
                     </h1>
                   )}
-                </h1>
+                </div>
                 {bids === null ? (
                   <h1>Error loading bids</h1>
                 ) : bids === undefined ? (

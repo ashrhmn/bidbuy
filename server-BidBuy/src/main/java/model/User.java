@@ -41,6 +41,9 @@ public class User {
     @Column(name = "type")
     private String type;
 
+    @Column(name = "is_email_verified")
+    private boolean isEmailVerified;
+
     @LazyCollection(LazyCollectionOption.FALSE)
     @OneToMany(mappedBy = "seller")
     private List<Product> soldProducts;
