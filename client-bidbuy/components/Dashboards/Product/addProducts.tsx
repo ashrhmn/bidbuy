@@ -52,16 +52,30 @@ export default function MyProducts() {
         return;
       }
       formdata.append("MMaExhYy6NYi67symxfOEP4Hb5fl7N", imgFile);
-      const image = await jsxService()
-        .post(`/firebase/upload`, formdata)
-        .then((res) => res.data.url);
+      const image = await toast.promise(
+        jsxService()
+          .post(`/firebase/upload`, formdata)
+          .then((res) => res.data.url),
+        {
+          error: "Error uploading image",
+          loading: "Uploading image",
+          success: "Image Uploaded",
+        }
+      );
       console.log({ image });
 
       if (typeof image !== "string") {
         toast.error("Error uploading image");
         return;
       }
-      await jsxService().post(`product/create`, { ...payload, image });
+      await toast.promise(
+        jsxService().post(`product/create`, { ...payload, image }),
+        {
+          error: "Error adding product",
+          loading: "Adding product",
+          success: "Product Added successfully",
+        }
+      );
       router.push(`/dashboard/my-products`);
     } catch (error) {
       console.log("Error adding products : ", error);

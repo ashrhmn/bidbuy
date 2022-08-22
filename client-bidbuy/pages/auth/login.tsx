@@ -10,6 +10,7 @@ import {
 } from "../../consts";
 import useAuth from "../../hooks/useAuth";
 import Layout from "../../components/Layout";
+import toast from "react-hot-toast";
 
 const SignInPage = () => {
   const { user } = useAuth();
@@ -25,9 +26,11 @@ const SignInPage = () => {
       setCookie(ACCESS_TOKEN_COOKIE_KEY, response.access_token);
       setCookie(REFRESH_TOKEN_COOKIE_KEY, response.refresh_token);
       console.log({ response });
+      toast.success("Logged in successful");
       router.replace(`/dashboard`);
     } catch (error) {
       console.log("sign-in : ", error);
+      toast.error("Invalid Username or Password");
     }
   };
   if (user === undefined) return <h1>Loading...</h1>;
