@@ -3,6 +3,8 @@ package controllers;
 
 import dtos.JwtPayloadDto;
 import dtos.LoginDto;
+import lombok.RequiredArgsConstructor;
+import model.EmailVerificationToken;
 import model.Kyc;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -11,11 +13,14 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.userdetails.User;
 import org.springframework.web.bind.annotation.*;
+import services.EmailVerificationTokenService;
 import services.KycService;
+import services.MailSenderService;
 import services.UserService;
 import utils.HashMapItem;
 import utils.HashMapUtils;
 import utils.JwtUtils;
+import utils.StringUtils;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -23,17 +28,15 @@ import java.util.Map;
 @RestController
 @RequestMapping("/auth")
 @CrossOrigin(origins = "*")
+@RequiredArgsConstructor
 public class AuthController {
 
     private final UserService userService;
     private final AuthenticationManager authenticationManager;
     private final KycService kycService;
+    private final MailSenderService mailSenderService;
+    private final EmailVerificationTokenService emailVerificationTokenService;
 
-    public AuthController(UserService userService, AuthenticationManager authenticationManager, KycService kycService) {
-        this.userService = userService;
-        this.authenticationManager = authenticationManager;
-        this.kycService = kycService;
-    }
 
     @PostMapping("/sign-in")
     public ResponseEntity<Map<String, String>> authenticate(@RequestBody LoginDto loginDto) {
@@ -84,6 +87,16 @@ public class AuthController {
         user.setEmailVerified(false);
         user.setType("user");
         userService.save(user);
+        String token = StringUtils.generateEmailToken();
+        EmailVerificationToken emailVerificationToken = new EmailVerificationToken();
+        emailVerificationToken.setToken(token);
+        emailVerificationToken.setUserId(user.getId());
+        emailVerificationTokenService.addToken(emailVerificationToken);
+        mailSenderService.sendEmail(
+                user.getEmail(),
+                "Verify Your Email",
+                "http://localhost:8080/server_BidBuy_war_exploded/auth/verify-email?token=" + token
+        );
         res.put("message", "User created successfully");
         return new ResponseEntity<>(res, HttpStatus.OK);
     }
@@ -121,6 +134,22 @@ public class AuthController {
                     HashMapItem.build("message", e.getMessage())
             ), HttpStatus.BAD_REQUEST);
         }
+    }
+
+    @GetMapping("verify-email")
+    public ResponseEntity<Map<String, String>> verifyEmail(@RequestParam(name = "token") String token) {
+        Map<String, String> res = new HashMap<>();
+        EmailVerificationToken dbToken = emailVerificationTokenService.getByToken(token);
+        if (dbToken == null) {
+            res.put("message", "Invalid Link");
+            return new ResponseEntity<>(res, HttpStatus.OK);
+        }
+        model.User dbUser = userService.getById(dbToken.getUserId());
+        dbUser.setEmailVerified(true);
+        userService.update(dbUser);
+        emailVerificationTokenService.deleteToken(dbToken.getId());
+        res.put("message", "Email Verified");
+        return new ResponseEntity<>(res, HttpStatus.OK);
     }
 
 }

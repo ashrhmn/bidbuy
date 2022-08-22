@@ -10,6 +10,7 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 import services.FirebaseService;
 import services.MailSenderService;
+import utils.StringUtils;
 
 import java.io.UnsupportedEncodingException;
 
@@ -44,9 +45,9 @@ public class TestController {
         return firebaseService.upload(multipartFile);
     }
 
+    @GetMapping("/test2")
     public String test2() {
-        String name = "dfsbafb";
-        return name.substring(name.lastIndexOf("."));
+        return StringUtils.generateEmailToken();
     }
 
     @GetMapping("/mail")
