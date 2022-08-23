@@ -82,8 +82,8 @@ public class AppConfig implements WebMvcConfigurer {
         JavaMailSenderImpl mailSender = new JavaMailSenderImpl();
         mailSender.setHost("smtp.sendgrid.net");
         mailSender.setPort(25);
-        mailSender.setUsername("apikey");
-        mailSender.setPassword("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");
+        mailSender.setUsername("");
+        mailSender.setPassword("");
         Properties props = mailSender.getJavaMailProperties();
         props.put("mail.transport.protocol", "smtp");
         props.put("mail.smtp.auth", "true");
