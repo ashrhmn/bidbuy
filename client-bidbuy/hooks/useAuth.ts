@@ -4,11 +4,12 @@ import { useRouter } from "next/router";
 import React, { useEffect, useState } from "react";
 import { ACCESS_TOKEN_COOKIE_KEY, REFRESH_TOKEN_COOKIE_KEY } from "../consts";
 import { authService, jsxService } from "../service";
+import { IUser } from "../types";
 
 const useAuth = () => {
   const [user, setUser] = useState<
     | {
-        id: import("e:/OneDrive - American International University-Bangladesh/AIUB/ATP 1/BidBuy/client-bidbuy/types").IUser | null;
+        id: IUser | null;
         username: string;
         roles: string[];
       }
